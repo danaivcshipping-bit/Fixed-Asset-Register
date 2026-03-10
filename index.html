@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vcshipping Asset Registry</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Sarabun', sans-serif; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .input-focus:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast {
+      animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full gradient-bg">
+  <div id="app" class="h-full overflow-auto"><!-- Header -->
+   <header class="py-6 px-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-center gap-3">
+     <div class="bg-white p-3 rounded-xl shadow-lg"><i data-lucide="monitor" class="w-8 h-8 text-blue-600"></i>
+     </div>
+     <div class="text-center">
+      <h1 id="main-title" class="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">ระบบบันทึกทะเบียนทรัพย์สิน</h1>
+      <p id="company-subtitle" class="text-blue-100 text-sm md:text-base">Vcshipping Co., Ltd.</p>
+     </div>
+    </div>
+   </header><!-- Tab Navigation -->
+   <div class="px-4 py-4 border-b-2 border-blue-200">
+    <div class="max-w-4xl mx-auto flex gap-4">
+     <button id="tab-add" class="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 active-tab"> <i data-lucide="plus-circle" class="w-5 h-5"></i> เพิ่มข้อมูล </button> <button id="tab-search" class="px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-xl hover:bg-blue-50 transition-all flex items-center gap-2"> <i data-lucide="search" class="w-5 h-5"></i> ค้นหาข้อมูล </button>
+    </div>
+   </div><!-- Main Form -->
+   <main class="px-4 pb-8">
+    <div class="max-w-4xl mx-auto">
+     <!-- Add Tab Content -->
+     <div id="add-section" class="block">
+      <form id="asset-form" class="glass-card rounded-3xl p-6 md:p-8 fade-in"><!-- Form Header -->
+       <div class="flex items-center gap-2 mb-6 pb-4 border-b-2 border-blue-100"><i data-lucide="clipboard-list" class="w-6 h-6 text-blue-600"></i>
+        <h2 class="text-xl font-semibold text-gray-800">กรอกข้อมูลทรัพย์สิน</h2>
+       </div><!-- Form Grid -->
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-5"><!-- หมายเลขเครื่อง -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="hash" class="w-4 h-4 text-blue-500"></i> หมายเลขเครื่อง <span class="text-red-500">*</span> </label> <input type="text" name="machine_number" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="เช่น PC-001">
+        </div><!-- รายการ/ยี่ห้อ/รุ่น -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="laptop" class="w-4 h-4 text-blue-500"></i> รายการ/ยี่ห้อ/รุ่น <span class="text-red-500">*</span> </label> <input type="text" name="item_brand_model" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="เช่น Dell OptiPlex 7090">
+        </div><!-- S/N -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="barcode" class="w-4 h-4 text-blue-500"></i> S/N (Serial Number) <span class="text-red-500">*</span> </label> <input type="text" name="serial_number" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="เช่น ABC123XYZ456">
+        </div><!-- Warranty -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i> Warranty </label> <select name="warranty" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all bg-white"> <option value="">-- เลือก --</option> <option value="1 ปี">1 ปี</option> <option value="2 ปี">2 ปี</option> <option value="3 ปี">3 ปี</option> <option value="5 ปี">5 ปี</option> <option value="หมดประกัน">หมดประกัน</option> </select>
+        </div><!-- START Date -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="calendar-plus" class="w-4 h-4 text-blue-500"></i> วันที่เริ่มประกัน (START) </label> <input type="date" name="start_date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all">
+        </div><!-- EXPIRE Date -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="calendar-x" class="w-4 h-4 text-blue-500"></i> วันหมดประกัน (EXPIRE) </label> <input type="date" name="expire_date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all">
+        </div><!-- WINDOWS -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="app-window" class="w-4 h-4 text-blue-500"></i> WINDOWS </label> <select name="windows" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all bg-white"> <option value="">-- เลือก --</option> <option value="Windows 11 Pro">Windows 11 Pro</option> <option value="Windows 11 Home">Windows 11 Home</option> <option value="Windows 10 Pro">Windows 10 Pro</option> <option value="Windows 10 Home">Windows 10 Home</option> <option value="Windows 7">Windows 7</option> <option value="ไม่มี">ไม่มี</option> </select>
+        </div><!-- WINDOWS Keygen -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="key" class="w-4 h-4 text-blue-500"></i> Windows Keygen </label> <input type="text" name="windows_keygen" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="ใส่ keygen ของ Windows">
+        </div><!-- MICROSOFT OFFICE -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="file-spreadsheet" class="w-4 h-4 text-blue-500"></i> MICROSOFT OFFICE </label> <select name="ms_office" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all bg-white"> <option value="">-- เลือก --</option> <option value="Microsoft 365">Microsoft 365</option> <option value="Office 2021">Office 2021</option> <option value="Office 2019">Office 2019</option> <option value="Office 2016">Office 2016</option> <option value="ไม่มี">ไม่มี</option> </select>
+        </div><!-- MS Office Keygen -->
+        <div class="space-y-2 md:col-span-1"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="key" class="w-4 h-4 text-blue-500"></i> MS Office Keygen </label> <input type="text" name="ms_office_keygen" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="ใส่ keygen ของ Office">
+        </div><!-- ชื่อผู้ใช้ -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="user" class="w-4 h-4 text-blue-500"></i> ชื่อผู้ใช้ <span class="text-red-500">*</span> </label> <input type="text" name="user_name" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="เช่น สมชาย ใจดี">
+        </div><!-- Department -->
+        <div class="space-y-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="building-2" class="w-4 h-4 text-blue-500"></i> Department <span class="text-red-500">*</span> </label> <select name="department" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all bg-white"> <option value="">-- เลือกแผนก --</option> <option value="IT">IT</option> <option value="HR">HR</option> <option value="Accounting">Accounting</option> <option value="Sales">Sales</option> <option value="Marketing">Marketing</option> <option value="Operations">Operations</option> <option value="Warehouse">Warehouse</option> <option value="Management">Management</option> <option value="อื่นๆ">อื่นๆ</option> </select>
+        </div><!-- Com name -->
+        <div class="space-y-2 md:col-span-2"><label class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="pc-case" class="w-4 h-4 text-blue-500"></i> Com Name (ชื่อเครื่อง) </label> <input type="text" name="com_name" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all" placeholder="เช่น VCS-PC-SALES-001">
+        </div>
+       </div><!-- Submit Button -->
+       <div class="mt-8 flex flex-col sm:flex-row gap-4"><button type="submit" id="submit-btn" class="flex-1 btn-primary text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"> <i data-lucide="save" class="w-5 h-5"></i> <span id="btn-text">บันทึกข้อมูล</span> </button> <button type="reset" class="sm:w-auto px-8 py-4 border-2 border-gray-300 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2"> <i data-lucide="rotate-ccw" class="w-5 h-5"></i> ล้างข้อมูล </button>
+       </div>
+      </form><!-- Info Card -->
+      <div class="mt-6 glass-card rounded-2xl p-5 fade-in" style="animation-delay: 0.2s;">
+       <div class="flex items-start gap-3">
+        <div class="bg-blue-100 p-2 rounded-lg"><i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
+        </div>
+        <div>
+         <h3 class="font-semibold text-gray-800 mb-1">คำแนะนำ</h3>
+         <p class="text-sm text-gray-600">กรุณากรอกข้อมูลที่มีเครื่องหมาย <span class="text-red-500">*</span> ให้ครบถ้วน ข้อมูลจะถูกบันทึกลงใน Google Sheets โดยอัตโนมัติ</p>
+        </div>
+       </div>
+      </div>
+     </div><!-- Search Tab Content -->
+     <div id="search-section" class="hidden">
+      <div class="glass-card rounded-3xl p-6 md:p-8 fade-in">
+       <div class="flex items-center gap-2 mb-6 pb-4 border-b-2 border-blue-100"><i data-lucide="search" class="w-6 h-6 text-blue-600"></i>
+        <h2 class="text-xl font-semibold text-gray-800">ค้นหาข้อมูลทรัพย์สิน</h2>
+       </div><!-- Search Type Selection -->
+       <div class="mb-6 space-y-3"><label class="text-sm font-medium text-gray-700">เลือกประเภทการค้นหา</label> <select id="search-type" class="w-full md:w-1/3 px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all bg-white"> <option value="machine_number">หมายเลขเครื่อง</option> <option value="user_name">ชื่อผู้ใช้</option> </select>
+       </div><!-- Search Bar -->
+       <div class="mb-6 space-y-3"><label id="search-label" class="flex items-center gap-2 text-sm font-medium text-gray-700"> <i data-lucide="hash" class="w-4 h-4 text-blue-500"></i> ค้นหาด้วยหมายเลขเครื่อง </label>
+        <div class="flex gap-2"><input type="text" id="search-value" placeholder="เช่น PC-001" class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl input-focus focus:border-blue-500 focus:outline-none transition-all"> <button id="search-btn" class="btn-primary text-white font-semibold py-3 px-8 rounded-xl flex items-center gap-2 hover:shadow-lg transition-all"> <i data-lucide="search" class="w-5 h-5"></i> ค้นหา </button>
+        </div>
+       </div><!-- Search Results -->
+       <div id="search-results" class="space-y-4"></div>
+       <div id="no-results" class="text-center py-12 text-gray-500"><i data-lucide="inbox" class="w-16 h-16 mx-auto mb-3 opacity-30"></i>
+        <p class="text-lg">กรุณากรอกข้อมูลเพื่อค้นหา</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main><!-- Toast Container -->
+   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  </div>
+  <script>
+    const SHEET_ID = "12oMA-E205LvawFyJi4Q6cA5zB1V10KwTicW4AxA_5U4";
+    const SHEET_NAME = "ทะเบียนคอมพิวเตอร์";
+    const defaultConfig = {
+      company_name: 'Vcshipping',
+      form_title: 'ระบบบันทึกทะเบียนทรัพย์สิน',
+      primary_color: '#2563eb',
+      secondary_color: '#1e3a8a',
+      background_color: '#ffffff',
+      text_color: '#1f2937',
+      accent_color: '#3b82f6'
+    };
+
+    // Tab switching
+    const tabAdd = document.getElementById('tab-add');
+    const tabSearch = document.getElementById('tab-search');
+    const addSection = document.getElementById('add-section');
+    const searchSection = document.getElementById('search-section');
+
+    tabAdd.addEventListener('click', () => {
+      addSection.classList.remove('hidden');
+      searchSection.classList.add('hidden');
+      tabAdd.classList.add('bg-white', 'text-blue-600', 'shadow-md');
+      tabAdd.classList.remove('bg-blue-100', 'text-blue-700');
+      tabSearch.classList.remove('bg-white', 'text-blue-600', 'shadow-md');
+      tabSearch.classList.add('bg-blue-100', 'text-blue-700');
+    });
+
+    tabSearch.addEventListener('click', () => {
+      addSection.classList.add('hidden');
+      searchSection.classList.remove('hidden');
+      tabSearch.classList.add('bg-white', 'text-blue-600', 'shadow-md');
+      tabSearch.classList.remove('bg-blue-100', 'text-blue-700');
+      tabAdd.classList.remove('bg-white', 'text-blue-600', 'shadow-md');
+      tabAdd.classList.add('bg-blue-100', 'text-blue-700');
+    });
+
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          const title = document.getElementById('main-title');
+          const subtitle = document.getElementById('company-subtitle');
+          
+          if (title) {
+            title.textContent = config.form_title || defaultConfig.form_title;
+          }
+          if (subtitle) {
+            subtitle.textContent = (config.company_name || defaultConfig.company_name) + ' Co., Ltd.';
+          }
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.primary_color || defaultConfig.primary_color,
+              set: (value) => {
+                config.primary_color = value;
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['company_name', config.company_name || defaultConfig.company_name],
+          ['form_title', config.form_title || defaultConfig.form_title]
+        ])
+      });
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+      const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info';
+      
+      toast.className = `toast ${bgColor} text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 min-w-72`;
+      toast.innerHTML = `
+        <i data-lucide="${icon}" class="w-6 h-6 flex-shrink-0"></i>
+        <span class="font-medium">${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Form submission
+    const form = document.getElementById('asset-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Disable button and show loading
+      submitBtn.disabled = true;
+      btnText.innerHTML = '<span class="inline-block animate-spin mr-2">⟳</span> กำลังบันทึก...';
+      
+      // Collect form data
+      const formData = new FormData(form);
+      const data = {
+        machine_number: formData.get('machine_number'),
+        item_brand_model: formData.get('item_brand_model'),
+        serial_number: formData.get('serial_number'),
+        warranty: formData.get('warranty') || '-',
+        start_date: formData.get('start_date') || '-',
+        expire_date: formData.get('expire_date') || '-',
+        windows: formData.get('windows') || '-',
+        windows_keygen: formData.get('windows_keygen') || '-',
+        ms_office: formData.get('ms_office') || '-',
+        ms_office_keygen: formData.get('ms_office_keygen') || '-',
+        user_name: formData.get('user_name'),
+        department: formData.get('department'),
+        com_name: formData.get('com_name') || '-',
+        timestamp: new Date().toLocaleString('th-TH')
+      };
+
+      try {
+        // Send to Google Apps Script
+        const response = await fetch('https://script.google.com/macros/s/AKfycbwS9rxs5LEcXFqERAPu_eVLwEDZzAF4wfGdgzQOiNAXkWNPle04RLaALWLZ3cXY7rDz/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        // Show success message
+        showToast('บันทึกข้อมูลสำเร็จแล้ว!', 'success');
+        
+        // Reset form
+        form.reset();
+        
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'error');
+      } finally {
+        // Re-enable button
+        submitBtn.disabled = false;
+        btnText.textContent = 'บันทึกข้อมูล';
+      }
+    });
+
+    // Search functionality
+    const searchBtn = document.getElementById('search-btn');
+    const searchType = document.getElementById('search-type');
+    const searchValue = document.getElementById('search-value');
+    const searchLabel = document.getElementById('search-label');
+    const searchResults = document.getElementById('search-results');
+    const noResults = document.getElementById('no-results');
+
+    // Update label when search type changes
+    searchType.addEventListener('change', () => {
+      const icon = searchType.value === 'machine_number' ? 'hash' : 'user';
+      const label = searchType.value === 'machine_number' ? 'ค้นหาด้วยหมายเลขเครื่อง' : 'ค้นหาด้วยชื่อผู้ใช้';
+      const placeholder = searchType.value === 'machine_number' ? 'เช่น PC-001' : 'เช่น สมชาย ใจดี';
+      
+      searchLabel.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-blue-500"></i> ${label}`;
+      searchValue.placeholder = placeholder;
+      searchValue.value = '';
+      lucide.createIcons();
+    });
+
+    searchBtn.addEventListener('click', async () => {
+      const searchFieldValue = searchValue.value.trim();
+      const fieldType = searchType.value;
+      
+      if (!searchFieldValue) {
+        showToast('กรุณากรอกข้อมูลเพื่อค้นหา', 'error');
+        return;
+      }
+
+      searchBtn.disabled = true;
+      searchBtn.innerHTML = '<span class="inline-block animate-spin mr-2">⟳</span> กำลังค้นหา...';
+      searchResults.innerHTML = '';
+      noResults.classList.add('hidden');
+
+      try {
+        // Build search URL with proper query parameters
+        const params = new URLSearchParams();
+        params.append('action', 'search');
+        params.append('field', fieldType === 'machine_number' ? 'machine_number' : 'user_name');
+        params.append('value', searchFieldValue);
+        
+        const url = 'https://script.google.com/macros/s/AKfycbwS9rxs5LEcXFqERAPu_eVLwEDZzAF4wfGdgzQOiNAXkWNPle04RLaALWLZ3cXY7rDz/exec?' + params.toString();
+        
+        console.log('🔍 Searching with URL:', url);
+        
+        const response = await fetch(url, {
+          method: 'GET'
+        });
+
+        console.log('🔍 Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const text = await response.text();
+        console.log('🔍 Raw response text:', text);
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.error('Failed to parse JSON:', e);
+          console.error('Raw text:', text);
+          throw new Error('Invalid JSON response from server');
+        }
+        
+        console.log('Parsed data:', data);
+        
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+          displaySearchResults(data.data);
+          showToast(`พบข้อมูล ${data.data.length} รายการ`, 'success');
+        } else {
+          const displayValue = fieldType === 'machine_number' ? 'เครื่อง' : 'ผู้ใช้';
+          noResults.innerHTML = `
+            <div class="text-center py-12">
+              <i data-lucide="inbox" class="w-16 h-16 mx-auto mb-3 opacity-30 text-gray-400"></i>
+              <p class="text-lg text-gray-500 font-medium">ไม่พบข้อมูล${displayValue}: <strong>${searchFieldValue}</strong></p>
+              <p class="text-sm text-gray-400 mt-2">ตรวจสอบข้อมูลและลองค้นหาใหม่</p>
+            </div>
+          `;
+          noResults.classList.remove('hidden');
+          lucide.createIcons();
+        }
+        
+      } catch (error) {
+        console.error('Search error:', error);
+        showToast('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+        noResults.innerHTML = `
+          <div class="text-center py-12">
+            <i data-lucide="alert-circle" class="w-16 h-16 mx-auto mb-3 opacity-30 text-red-400"></i>
+            <p class="text-lg text-gray-500 font-medium">เกิดข้อผิดพลาด</p>
+            <p class="text-sm text-gray-400 mt-2">${error.message}</p>
+          </div>
+        `;
+        noResults.classList.remove('hidden');
+        lucide.createIcons();
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = '<i data-lucide="search" class="w-5 h-5"></i> ค้นหา';
+      }
+    });
+
+    // Allow search on Enter key
+    searchValue.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchBtn.click();
+      }
+    });
+
+    function displaySearchResults(results) {
+      const searchResults = document.getElementById('search-results');
+      const noResults = document.getElementById('no-results');
+
+      searchResults.innerHTML = '';
+      
+      results.forEach((item, index) => {
+        const resultCard = document.createElement('div');
+        resultCard.className = 'bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-200 fade-in';
+        resultCard.style.animationDelay = `${index * 0.1}s`;
+        resultCard.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">หมายเลขเครื่อง</p>
+              <p class="text-lg font-bold text-gray-800">${item.machine_number || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">รายการ/ยี่ห้อ/รุ่น</p>
+              <p class="text-base font-semibold text-gray-700">${item.item_brand_model || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Serial Number</p>
+              <p class="text-base font-mono bg-white px-3 py-2 rounded-lg text-gray-600 break-all">${item.serial_number || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">ชื่อผู้ใช้</p>
+              <p class="text-base font-semibold text-gray-700">${item.user_name || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Department</p>
+              <p class="text-base font-semibold text-gray-700">${item.department || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Com Name</p>
+              <p class="text-base font-mono bg-white px-3 py-2 rounded-lg text-gray-600 break-all">${item.com_name || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Windows</p>
+              <p class="text-base font-semibold text-gray-700">${item.windows || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Windows Keygen</p>
+              <p class="text-sm font-mono bg-white px-3 py-2 rounded-lg text-gray-600 break-all">${item.windows_keygen || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">MS Office</p>
+              <p class="text-base font-semibold text-gray-700">${item.ms_office || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">MS Office Keygen</p>
+              <p class="text-sm font-mono bg-white px-3 py-2 rounded-lg text-gray-600 break-all">${item.ms_office_keygen || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Warranty</p>
+              <p class="text-base font-semibold text-gray-700">${item.warranty || '-'}</p>
+            </div>
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">วันที่บันทึก</p>
+              <p class="text-base font-semibold text-gray-700">${item.timestamp || '-'}</p>
+            </div>
+          </div>
+        `;
+        searchResults.appendChild(resultCard);
+      });
+      
+      noResults.classList.add('hidden');
+      searchResults.classList.remove('hidden');
+      lucide.createIcons();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9da0e1d4708037d6',t:'MTc3MzEzMDYzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
